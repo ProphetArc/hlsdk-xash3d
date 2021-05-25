@@ -319,6 +319,17 @@ BOOL CHalfLifeMultiplay::FShouldSwitchWeapon( CBasePlayer *pPlayer, CBasePlayerI
 		return TRUE;
 	}
 
+	if( !pPlayer->m_iAutoWepSwitch )
+	{
+		return FALSE;
+	}
+
+	if( pPlayer->m_iAutoWepSwitch == 2
+	    && pPlayer->m_afButtonLast & ( IN_ATTACK | IN_ATTACK2 ) )
+	{
+		return FALSE;
+	}
+
 	if( !pPlayer->m_pActiveItem->CanHolster() )
 	{
 		// can't put away the active item.
@@ -568,7 +579,11 @@ void CHalfLifeMultiplay::PlayerSpawn( CBasePlayer *pPlayer )
 {
 	BOOL		addDefault;
 	CBaseEntity	*pWeaponEntity = NULL;
+	int 		iOldAutoWepSwitch;
 
+	iOldAutoWepSwitch = pPlayer->m_iAutoWepSwitch;
+
+	pPlayer->m_iAutoWepSwitch = 1;
 	pPlayer->pev->weapons |= ( 1 << WEAPON_SUIT );
 
 	addDefault = TRUE;
@@ -585,6 +600,8 @@ void CHalfLifeMultiplay::PlayerSpawn( CBasePlayer *pPlayer )
 		pPlayer->GiveNamedItem( "weapon_9mmhandgun" );
 		pPlayer->GiveAmmo( 68, "9mm", _9MM_MAX_CARRY );// 4 full reloads
 	}
+
+	pPlayer->m_iAutoWepSwitch = iOldAutoWepSwitch;
 }
 
 //=========================================================
@@ -692,12 +709,12 @@ void CHalfLifeMultiplay::DeathNotice( CBasePlayer *pVictim, entvars_t *pKiller, 
 	const char *tau = "tau_cannon";
 	const char *gluon = "gluon gun";
 
-	if( pKiller->flags & FL_CLIENT )
+	if( pevInflictor )
 	{
-		killer_index = ENTINDEX( ENT( pKiller ) );
-
-		if( pevInflictor )
+		if( pKiller->flags & FL_CLIENT )
 		{
+			killer_index = ENTINDEX( ENT( pKiller ) );
+
 			if( pevInflictor == pKiller )
 			{
 				// If the inflictor is the killer,  then it must be their current weapon doing the damage
@@ -713,10 +730,10 @@ void CHalfLifeMultiplay::DeathNotice( CBasePlayer *pVictim, entvars_t *pKiller, 
 				killer_weapon_name = STRING( pevInflictor->classname );  // it's just that easy
 			}
 		}
-	}
-	else
-	{
-		killer_weapon_name = STRING( pevInflictor->classname );
+		else
+		{
+			killer_weapon_name = STRING( pevInflictor->classname );
+		}
 	}
 
 	// strip the monster_* or weapon_* from the inflictor's classname
@@ -1331,7 +1348,8 @@ int ReloadMapCycleFile( const char *filename, mapcycle_t *cycle )
 			hasbuffer = 0;
 
 			pFileList = COM_Parse( pFileList );
-			if( strlen( com_token ) <= 0 )
+
+			if( com_token[0] == '\0' )
 				break;
 
 			strcpy( szMap, com_token );
@@ -1340,7 +1358,8 @@ int ReloadMapCycleFile( const char *filename, mapcycle_t *cycle )
 			if( COM_TokenWaiting( pFileList ) )
 			{
 				pFileList = COM_Parse( pFileList );
-				if( strlen( com_token ) > 0 )
+
+				if( com_token[0] != '\0' )
 				{
 					hasbuffer = 1;
 					strcpy( szBuffer, com_token );
@@ -1496,7 +1515,8 @@ void ExtractCommandString( char *s, char *szCommand )
 		*o = 0;
 
 		strcat( szCommand, pkey );
-		if( strlen( value ) > 0 )
+
+		if( value[0] != '\0' )
 		{
 			strcat( szCommand, " " );
 			strcat( szCommand, value );
@@ -1631,13 +1651,15 @@ void CHalfLifeMultiplay::ChangeLevel( void )
 	{
 		ALERT( at_console, "PLAYER COUNT:  min %i max %i current %i\n", minplayers, maxplayers, curplayers );
 	}
-	if( strlen( szRules ) > 0 )
+
+	if( szRules[0] != '\0' )
 	{
 		ALERT( at_console, "RULES:  %s\n", szRules );
 	}
 
 	CHANGE_LEVEL( szNextMap, NULL );
-	if( strlen( szCommands ) > 0 )
+
+	if( szCommands[0] != '\0' )
 	{
 		SERVER_COMMAND( szCommands );
 	}
