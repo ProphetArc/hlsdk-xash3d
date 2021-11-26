@@ -336,7 +336,7 @@ BOOL CCTFMultiplay::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
 			case 2:
 				JoinTeam(pPlayer, BLUE);
 				break;
-			case 5:
+			case 7:
 				JoinTeam(pPlayer, TeamWithFewestPlayers());
 				break;
 			}
@@ -353,7 +353,9 @@ BOOL CCTFMultiplay::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
 			case 2:
 				JoinTeam(pPlayer, BLUE);
 				break;
-			case 5:
+			case 6:
+				break;
+			case 7:
 				JoinTeam(pPlayer, TeamWithFewestPlayers());
 				break;
 			default:
@@ -375,7 +377,7 @@ BOOL CCTFMultiplay::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
 	{
 		if (pPlayer->pev->team != 0)
 		{
-			pPlayer->ShowMenu(1 + 2 + 16 + 512, -1, FALSE, "#Team_Menu_Join_IG");
+			pPlayer->ShowMenu(1 + 2 + 16 + 512, -1, FALSE, "#CTFChooseTeamB");
 			pPlayer->m_iMenu = Team_Menu_IG;
 		}
 
@@ -546,7 +548,7 @@ void CCTFMultiplay::InitHUD(CBasePlayer *pPlayer)
 
 	if (pPlayer->pev->team == 0)
 	{
-		pPlayer->ShowMenu(1 + 2 + 16, -1, FALSE, "#Team_Menu_Join");
+		pPlayer->ShowMenu(1 + 2 + 16, -1, FALSE, "#CTFChooseTeamA");
 		pPlayer->m_iMenu = Team_Menu;
 	}
 }
