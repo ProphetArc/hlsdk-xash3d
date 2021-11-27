@@ -482,14 +482,10 @@ void CCTFMultiplay::PlayerSpawn(CBasePlayer *pPlayer)
 			pPlayer->m_afPhysicsFlags &= ~PFLAG_OBSERVER;
 
 #if 0
-			// Start with init ammoload
-			pPlayer->m_iAmmoShells = 25;
-
-			// Start with shotgun and axe
-			pPlayer->GiveNamedItem("weapon_quakegun");
-			pPlayer->m_iQuakeItems |= (IT_SHOTGUN | IT_AXE | IT_EXTRA_WEAPON);
-			pPlayer->m_iQuakeWeapon = pPlayer->W_BestWeapon();
-			pPlayer->W_SetCurrentAmmo();
+			pPlayer->GiveNamedItem( "weapon_pipewrench" );
+			pPlayer->GiveNamedItem( "weapon_eagle" );
+			pPlayer->GiveNamedItem( "weapon_grapple" );
+			pPlayer->GiveAmmo( DEAGLE_DEFAULT_GIVE * 3, "357", _357_MAX_CARRY );
 #endif
 
 			pPlayer->m_flFlagStatusTime = gpGlobals->time + 0.1;
